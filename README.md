@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/41008a8a-7189-40ce-93ee-d00daa11487b/deploy-status)](https://app.netlify.com/sites/anvayb-can-of-books/deploys)
+
 # Can of Books
 
 **Author**: Anvay Bhanap, Rachel Freeland
