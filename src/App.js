@@ -11,6 +11,7 @@ import Login from './Login.js';
 import Books from './BestBooks.js';
 import Profile from './Profile.js';
 import { withAuth0 } from '@auth0/auth0-react';
+//import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 
 
 class App extends React.Component {
@@ -24,11 +25,9 @@ class App extends React.Component {
             <Header />
             <Switch>
               <Route exact path="/">
-                {/* TODO: if the user is logged in, render the `BestBooks` component, if they are not, render the `Login` component */}
-                {this.props.auth0.isAuthenticated && <Login />}
+                {!this.props.auth0.isAuthenticated && <Login />}
                 {this.props.auth0.isAuthenticated && <Books />}
               </Route>
-              {/* TODO: add a route with a path of '/profile' that renders a `Profile` component */}
               <Route exact path='/profile'>
                 <Profile />
               </Route>
