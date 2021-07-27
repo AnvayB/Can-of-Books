@@ -56,3 +56,15 @@ Books are life-changing. They have the power to enlighten, educate, entertain, h
 - How will you approach each other and the challenge of building an application knowing that it is impossible for two people to be at the exact same place in understanding and skill level?
   - help each other understand content that either of us is weaker in
   - work on the same content together so we can find the best way to solve an issue
+
+---
+
+Name of feature: Setup & Authentication
+
+Estimate of time needed to complete: 5 hrs
+
+Start time: 1:15pm
+
+Finish time: 9:00pm (with a few hours break)
+
+Actual time needed to complete: 6.5 hrs
