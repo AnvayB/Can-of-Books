@@ -5,3 +5,8 @@ a{
 a:hover{
   color:darkgrey;
 }
+
+#home, #profile, #login, #logout {
+  margin-right: 30px;
+}
+
