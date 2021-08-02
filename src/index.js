@@ -1,12 +1,15 @@
-import { Auth0Provider } from '@auth0/auth0-react';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import { Auth0Provider } from "@auth0/auth0-react";
 
-// TODO: wrap everything in Auth0
 ReactDOM.render(
-  <Auth0Provider domain="anvayb.us.auth0.com" clientId="fcqe9T53iKML0Dkl2y2Oa3Ea6P3lmbiJ" redirectUri="http://localhost:3000"> 
+  <Auth0Provider
+    domain="anvayb.us.auth0.com"
+    clientId="5ng54os1ulgiB9hDpPHFqlu1aFH8EblU"
+    redirectUri={window.location.origin}
+  >
     <App />
   </Auth0Provider>,
-  document.getElementById('app')
+  document.getElementById("root")
 );
