@@ -1,98 +1,113 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Carousel, Form, Button } from 'react-bootstrap';
-import './BestBooks.css';
 import axios from 'axios';
+import { Carousel, Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-class MyFavoriteBooks extends React.Component {
-  constructor(props) {
+import { withAuth0 } from '@auth0/auth0-react';
+
+import './BestBooks.css'; 
+
+class BestBooks extends React.Component {
+  constructor(props){
     super(props);
-    this.state = {
-      bookArray: [],
-      book: [],
-      email: '',
-      bookTitle: '',
-      bookDescription: '',
-      bookStatus: ''
+    this.state={
+      books: [],
+      displayBookForm: false,
+      newBook: true,
+      show: true,
+      updateIdx: -1,
     }
   }
-  
 
-  componentDidMount() {
-    axios.get('http://localhost:3000/books').then(books => {
-      this.setState(
-        {bookArray: books.data,
-        email: books.data[0].email})
-      console.log(`Current State is: ${this.state.bookArray}`);
-    })
+  componentDidMount = () => {
+    // get the jwt and send in the headers
+    this.props.auth0.getIdTokenClaims()
+      .then(async res => {
+        const jwt = res.__raw;
+
+        const config = {
+          headers: {"Authorization" : `Bearer ${jwt}`}, 
+          baseURL: process.env.REACT_APP_SERVER,
+          url: '/books',
+          params: { email: this.props.auth0.user.email },
+          method: 'get'
+        }
+        // make a call to the backend to get the the books and display them
+        const books = await axios(config);
+
+        this.setState({ books: books.data });
+      })
+      .catch(err => console.error(err));
   }
 
-  addBook = e => {
-    e.preventDefault();
-    axios.post('http://localhost:3000/books', {email: this.state.email, books: [{ name: this.state.bookName, description: this.state.bookDescription, status: this.state.bookStatus}]}).then(book => {
-      console.log(book.data.name);
-      this.setState({books: [...this.state.books, {bookName: book.data.name}]})
-    })
+  handleClose = () => this.setState({ displayBookForm: false });
+
+  updateBookArray = (books) => this.setState({books});
+
+  removeBook = (idx) => {
+    this.props.auth0.getIdTokenClaims()
+      .then(async res => {
+        const jwt = res.__raw;
+        const id = this.state.books[idx]._id;
+        let newBooks = this.state.books;
+        newBooks = newBooks.filter((book, i) => i !== idx);
+        this.setState({ books: newBooks });
+
+        const config = {
+          params: {email: this.props.auth0.user.email},
+          headers: {"Authorization" : `Bearer ${jwt}`},
+          method: 'delete',
+          baseURL: process.env.REACT_APP_SERVER,
+          url: `/books/${id}`
+        }
+
+        axios(config);
+      })
+      .catch(err => console.error(err));
   }
 
-  updateBookName = e => {
-    this.setState({name: e.target.value})
-  }
-
-  updateBookDescription = e => {
-    this.setState({description: e.target.value})
-  }
-
-  updateBookStatus = e => {
-    this.setState({status: e.target.value})
-  }
-
-  deleteBook = (e, id) => {
-    e.preventDefault();
-    axios.delete(`http://localhost:3001/books/${id}`).then(result => {
-      console.log(result);
-    })
-}
-  
-  
   render() {
     return(
       <>
+        <h2>My favorite books</h2>
+        {/* <AddABookButton 
+          addABook={() => this.setState({ displayBookForm: true })}
+        /> */}
+
+        {/* {this.state.displayBookForm && 
+          // <BookFormModal
+          //   close={this.handleClose}
+          //   updateBookArray={this.updateBookArray}
+          //   show={this.state.show}
+          //   book={this.state.books[this.state.updateIdx]}
+          //   newBook={this.state.newBook}
+          //   index={this.state.updateIdx}
+          // />
+        } */}
+
         <Carousel>
-          {this.state.bookArray.map((book) => {
-            return (
-              <Carousel.Item>
-                <img src="https://via.placeholder.com/300x400.png" alt="" />
+          {this.state.books.length && this.state.books.map((book, idx) => (
+            <Carousel.Item key={idx}>
+              <img
+                className="d-block w-100"
+                src={book.img}
+                alt={book.name}
+                />
               <Carousel.Caption>
-                  <h2>{book.books[0].name}</h2>
-                  <h3>{book.books[0].description}</h3>
-                </Carousel.Caption>
-              </Carousel.Item>
-          )})}
+                <h3>{book.name}</h3>
+                <p>{book.description}</p>
+                <p>{book.status}</p>
+              </Carousel.Caption>
+              <div className="center">
+                <Button onClick={() => this.removeBook(idx)}>Delete</Button>
+                <Button onClick={() => this.setState({displayBookForm:true, newBook: false, updateIdx: idx})}>Update</Button>
+              </div>
+            </Carousel.Item>
+          ))}
         </Carousel>
-        <Form onSubmit={this.addBook}>
-          <Form.Group className="mb-3" controlId="formBookTitle">
-            <Form.Label>Book Title</Form.Label>
-            <Form.Control type="text" placeholder="Enter book name" onChange={this.updateBookName}/>
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="formUserDescription">
-            <Form.Label>Description</Form.Label>
-            <Form.Control type="text" placeholder="Enter short description" onChange={this.updateBookDescription}/>
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="formSetStatus">
-            <Form.Label>Current Status</Form.Label>
-            <Form.Control type="text" placeholder="Reading, Completed, On hold, etc." onChange={this.updateBookStatus}/>
-          </Form.Group>
-
-          <Button variant="primary" type="submit" onClick={this.addBook}>
-            Enter
-          </Button>
-        </Form>
       </>
     )
   }
 }
 
-export default MyFavoriteBooks;
+export default withAuth0(BestBooks);
